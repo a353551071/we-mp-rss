@@ -133,6 +133,7 @@ class PlaywrightController:
             # 补丁：支持 BROWSER_TYPE 环境变量，用户可强制指定 webkit/chromium/firefox，
             # 微信公众平台在 Windows 本地 Chrome 下经常触发反爬（QR 加载超时），
             # 此时设置 BROWSER_TYPE=webkit 可绕过。
+            CHROME_PATH = None
             _forced_browser = os.environ.get("BROWSER_TYPE", "").strip().lower()
             if _forced_browser in ("webkit", "chromium", "firefox", "msedge"):
                 self.browser_type = _forced_browser
