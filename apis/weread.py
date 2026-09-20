@@ -54,8 +54,11 @@ def _get_weread_config() -> Config:
     return Config(lic_path)
 
 
+WEREAD_REDIS_KEY = "werss:weread:data"
+
+
 def _load_weread_data() -> dict:
-    """加载微信读书数据"""
+    """加载微信读书数据（文件优先；文件缺失/为空时从 Redis 镜像恢复——容器临时盘重启即丢）"""
     cfg = _get_weread_config()
     data = cfg.get("weread_data", {})
     if isinstance(data, str):
@@ -63,15 +66,35 @@ def _load_weread_data() -> dict:
             data = json.loads(data)
         except Exception:
             data = {}
+    if not data.get("cookie"):
+        try:
+            from core.redis_client import redis_client
+            if redis_client.is_connected:
+                raw = redis_client._client.get(WEREAD_REDIS_KEY)
+                if raw:
+                    restored = json.loads(raw)
+                    if isinstance(restored, dict) and restored.get("cookie"):
+                        cfg.set("weread_data", restored)
+                        cfg.save_config()
+                        cfg.reload()
+                        return restored
+        except Exception:
+            pass
     return data
 
 
 def _save_weread_data(data: dict):
-    """保存微信读书数据"""
+    """保存微信读书数据（写文件 + Redis 镜像，重启不丢）"""
     cfg = _get_weread_config()
     cfg.set("weread_data", data)
     cfg.save_config()
     cfg.reload()
+    try:
+        from core.redis_client import redis_client
+        if redis_client.is_connected:
+            redis_client._client.set(WEREAD_REDIS_KEY, json.dumps(data, ensure_ascii=False))
+    except Exception:
+        pass
 
 
 @router.get("", summary="获取微信读书配置状态")
