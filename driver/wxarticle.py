@@ -23,7 +23,7 @@ class WXArticleFetcher:
     完全基于 async/await,与 FastAPI 完美兼容
     """
     
-    def __init__(self, wait_timeout: int = 10000):
+    def __init__(self, wait_timeout: int = 60000):
         """初始化文章获取器"""
         self.wait_timeout = wait_timeout
         self.controller = PlaywrightController(apply_anti_crawler=False)

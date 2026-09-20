@@ -3,11 +3,15 @@ FROM --platform=$BUILDPLATFORM ghcr.io/rachelos/base-full:latest AS runtime
 
 ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 ENV INSTALL=True
-ENV BROWSER_TYPE=webkit
+ENV BROWSER_TYPE=chromium
 ENV PLANT_PATH=/app/env
 ENV WEREAD_LIC_PATH=/app/data/wx.lic
 ENV WEREAD_PROFILE_DIR=/app/data/weread-chrome-profile
 ENV PLAYWRIGHT_BROWSERS_PATH=/app/env/driver/_x86_64
+
+# mp.weixin.qq.com 发布 AAAA(IPv6)，容器网络无 v6 路由时 webkit/gio 解析 v6 黑洞导致 goto 必超时；
+# 强制 getaddrinfo IPv4 优先（webkit(gio)/chromium 的 DNS 均走 getaddrinfo）
+RUN echo "precedence ::ffff:0:0/96  100" >> /etc/gai.conf
 
 WORKDIR /app
 RUN echo "1.0.$(date +%Y%m%d.%H%M)">>docker_version.txt
