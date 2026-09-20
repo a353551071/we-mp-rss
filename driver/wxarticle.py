@@ -26,7 +26,7 @@ class WXArticleFetcher:
     def __init__(self, wait_timeout: int = 10000):
         """初始化文章获取器"""
         self.wait_timeout = wait_timeout
-        self.controller = PlaywrightController()
+        self.controller = PlaywrightController(apply_anti_crawler=False)
         self.browser_proxy_url = ""
         
         if cfg.get("proxy.enabled", False):
@@ -80,7 +80,8 @@ class WXArticleFetcher:
             # 使用异步上下文管理器
             async with PlaywrightController(
                 proxy_url=self.browser_proxy_url,
-                mobile_mode=True
+                mobile_mode=True,
+                apply_anti_crawler=False
             ) as controller:
 
                 # 打开URL

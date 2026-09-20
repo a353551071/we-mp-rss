@@ -35,7 +35,7 @@ class Wx:
     def __init__(self):
         self.lock_path=os.path.dirname(self.lock_file_path)
         self.refresh_interval=3660*24
-        self.controller=PlaywrightController()
+        self.controller=PlaywrightController(apply_anti_crawler=False)
         if not os.path.exists(self.lock_path):
             os.makedirs(self.lock_path)
         self.Clean()
@@ -168,7 +168,7 @@ class Wx:
             # 检查 controller 和 Page 对象是否有效；若不存在则回退到重新启动浏览器
             if not hasattr(self, 'controller') or self.controller is None:
                 print_warning("Controller 未初始化，正在重新创建浏览器...")
-                self.controller = PlaywrightController()
+                self.controller = PlaywrightController(apply_anti_crawler=False)
 
             if not self.controller.is_page_valid() or self.controller.page is None:
                 report("starting_browser", "浏览器 Page 无效，正在重新打开公众平台…", 40)
@@ -402,7 +402,7 @@ class Wx:
 
             # 复用已有的controller实例,避免重复创建
             if not hasattr(self, 'controller') or self.controller is None:
-                self.controller = PlaywrightController()
+                self.controller = PlaywrightController(apply_anti_crawler=False)
 
             controller = self.controller
             # 保存到临时变量，让 Call_Success 和 _extract_wechat_data 能使用
@@ -533,7 +533,7 @@ class Wx:
             # 清理现有资源
             self.cleanup_resources()
 
-            self.controller = PlaywrightController()
+            self.controller = PlaywrightController(apply_anti_crawler=False)
             # 初始化浏览器控制器
             driver = self.controller
             # 启动浏览器并打开微信公众平台

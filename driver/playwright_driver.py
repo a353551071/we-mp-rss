@@ -236,7 +236,7 @@ class PlaywrightController:
             
     async def open_url(self, url: str,
                        wait_until: str = "domcontentloaded",
-                       timeout: int = 30000) -> bool:
+                       timeout: int = 90000) -> bool:
         """
         打开URL(异步)
 
